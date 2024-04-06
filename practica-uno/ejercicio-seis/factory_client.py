@@ -1,32 +1,70 @@
-# Importamos la biblioteca requests para hacer peticiones HTTP
 import requests
+import json
 
-# Definimos la URL del servicio al que vamos a hacer la petición
-url = "http://localhost:8000/delivery"
-
-# Definimos los encabezados HTTP que vamos a enviar con la petición
+url = "http://localhost:8000/animals"
 headers = {"Content-Type": "application/json"}
 
-# Definimos el tipo de vehículo como "motorcycle"
-vehicle_type = "motorcycle"
-data = {"vehicle_type": vehicle_type}
+# Crear un mamífero
+data = {
+    "animal_type": "Mammal",
+    "nombre": "Elefante",
+    "genero": "Masculino",
+    "edad": 10,
+    "peso": 4000,
+    "gestation_period": 22
+}
 
-# Hacemos una petición POST a la URL con los datos y encabezados definidos
 response = requests.post(url, json=data, headers=headers)
+print(response.text)
 
-if response.status_code == 200:
-    print(response.text)
-else:
-    print("Error scheduling delivery:", response.text)
+# Crear un ave
+data = {
+    "animal_type": "Bird",
+    "nombre": "Águila",
+    "genero": "Femenino",
+    "edad": 5,
+    "peso": 6,
+    "wingspan": 2
+}
 
-# Cambiamos el tipo de vehículo a "drone"
-vehicle_type = "drone"
-data = {"vehicle_type": vehicle_type}
-
-# Hacemos otra petición POST a la URL con los nuevos datos y los mismos encabezados
 response = requests.post(url, json=data, headers=headers)
+print(response.text)
 
-if response.status_code == 200:
-    print(response.text)
-else:
-    print("Error scheduling delivery:", response.text)
+# Crear un reptil
+data = {
+    "animal_type": "Reptile",
+    "nombre": "Cocodrilo",
+    "genero": "Masculino",
+    "edad": 15,
+    "peso": 500,
+    "scale_type": "Escamoso"
+}
+
+response = requests.post(url, json=data, headers=headers)
+print(response.text)
+
+# Crear un anfibio
+data = {
+    "animal_type": "Amphibian",
+    "nombre": "Rana",
+    "genero": "Femenino",
+    "edad": 2,
+    "peso": 0.1,
+    "skin_type": "Húmeda"
+}
+
+response = requests.post(url, json=data, headers=headers)
+print(response.text)
+
+# Crear un pez
+data = {
+    "animal_type": "Fish",
+    "nombre": "Salmón",
+    "genero": "Masculino",
+    "edad": 3,
+    "peso": 5,
+    "habitat": "Agua dulce"
+}
+
+response = requests.post(url, json=data, headers=headers)
+print(response.text)

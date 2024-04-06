@@ -1,71 +1,98 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 
-# Producto: Pizza
-class Pizza:
+# Producto: Paciente
+class Paciente:
     def __init__(self):
-        self.tamaño = None
-        self.masa = None
-        self.toppings = []
+        self.CI = None
+        self.nombre = None
+        self.apellido = None
+        self.edad = None
+        self.genero = None
+        self.diagnostico = None
+        self.doctor = None
 
     def __str__(self):
-        return f"Tamaño: {self.tamaño}, Masa: {self.masa}, Toppings: {', '.join(self.toppings)}"
+        return f"CI: {self.CI}, Nombre: {self.nombre}, Apellido: {self.apellido}, Edad: {self.edad}, Género: {self.genero}, Diagnóstico: {self.diagnostico}, Doctor: {self.doctor}"
 
-# Builder: Constructor de pizzas
-class PizzaBuilder:
+# Builder: Constructor de pacientes
+class PacienteBuilder:
     def __init__(self):
-        self.pizza = Pizza()
+        self.paciente = Paciente()
 
-    def set_tamaño(self, tamaño):
-        self.pizza.tamaño = tamaño
+    def set_CI(self, CI):
+        self.paciente.CI = CI
 
-    def set_masa(self, masa):
-        self.pizza.masa = masa
+    def set_nombre(self, nombre):
+        self.paciente.nombre = nombre
 
-    def add_topping(self, topping):
-        self.pizza.toppings.append(topping)
+    def set_apellido(self, apellido):
+        self.paciente.apellido = apellido
 
-    def get_pizza(self):
-        return self.pizza
+    def set_edad(self, edad):
+        self.paciente.edad = edad
 
-# Director: Pizzería
-class Pizzeria:
+    def set_genero(self, genero):
+        self.paciente.genero = genero
+
+    def set_diagnostico(self, diagnostico):
+        self.paciente.diagnostico = diagnostico
+
+    def set_doctor(self, doctor):
+        self.paciente.doctor = doctor
+
+    def get_paciente(self):
+        return self.paciente
+
+# Director: Hospital
+class Hospital:
     def __init__(self, builder):
         self.builder = builder
 
-    def create_pizza(self, tamaño, masa, toppings):
-        self.builder.set_tamaño(tamaño)
-        self.builder.set_masa(masa)
-        for topping in toppings:
-            self.builder.add_topping(topping)
-        return self.builder.get_pizza()
+    def registrar_paciente(self, CI, nombre, apellido, edad, genero, diagnostico, doctor):
+        self.builder.set_CI(CI)
+        self.builder.set_nombre(nombre)
+        self.builder.set_apellido(apellido)
+        self.builder.set_edad(edad)
+        self.builder.set_genero(genero)
+        self.builder.set_diagnostico(diagnostico)
+        self.builder.set_doctor(doctor)
+        return self.builder.get_paciente()
 
 # Manejador de solicitudes HTTP
-class PizzaHandler(BaseHTTPRequestHandler):
+class PacienteHandler(BaseHTTPRequestHandler):
     def do_POST(self):
-        if self.path == '/pizza':
+        if self.path == '/paciente':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
 
             data = json.loads(post_data.decode('utf-8'))
 
-            tamaño = data.get('tamaño', None)
-            masa = data.get('masa', None)
-            toppings = data.get('toppings', [])
+            CI = data.get('CI', None)
+            nombre = data.get('nombre', None)
+            apellido = data.get('apellido', None)
+            edad = data.get('edad', None)
+            genero = data.get('genero', None)
+            diagnostico = data.get('diagnostico', None)
+            doctor = data.get('doctor', None)
 
-            builder = PizzaBuilder()
-            pizzeria = Pizzeria(builder)
+            builder = PacienteBuilder()
+            hospital = Hospital(builder)
 
-            pizza = pizzeria.create_pizza(tamaño, masa, toppings)
+            paciente = hospital.registrar_paciente(CI, nombre, apellido, edad, genero, diagnostico, doctor)
 
             self.send_response(201)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
 
             response = {
-                'tamaño': pizza.tamaño,
-                'masa': pizza.masa,
-                'toppings': pizza.toppings
+                'CI': paciente.CI,
+                'nombre': paciente.nombre,
+                'apellido': paciente.apellido,
+                'edad': paciente.edad,
+                'genero': paciente.genero,
+                'diagnostico': paciente.diagnostico,
+                'doctor': paciente.doctor
             }
 
             self.wfile.write(json.dumps(response).encode('utf-8'))
@@ -73,7 +100,7 @@ class PizzaHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
-def run(server_class=HTTPServer, handler_class=PizzaHandler, port=8000):
+def run(server_class=HTTPServer, handler_class=PacienteHandler, port=8000):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print(f"Iniciando servidor HTTP en puerto {port}...")

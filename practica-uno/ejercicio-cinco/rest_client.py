@@ -1,22 +1,54 @@
 import requests
+import json
 
-# Consultando a un servidor RESTful
-url = "http://localhost:8000/"
-# GET obtener a todos los estudiantes por la ruta /estudiantes
-ruta_get = url + "estudiantes"
-get_response = requests.request(method="GET", url=ruta_get)
-print(get_response.text)
-# POST agrega un nuevo estudiante por la ruta /estudiantes
-ruta_post = url + "estudiantes"
-nuevo_estudiante = {
-    "nombre": "Juanito",
-    "apellido": "Pérez",
-    "carrera": "Ingeniería Agronomica",
+url = "http://localhost:8000/animales"
+headers = {'Content-type': 'application/json'}
+
+# Crear un animal
+nuevo_animal = {
+    "nombre": "León",
+    "especie": "Panthera leo",
+    "genero": "Masculino",
+    "edad": 5,
+    "peso": 180
 }
-post_response = requests.request(method="POST", url=ruta_post, json=nuevo_estudiante)
-print(post_response.text)
+response = requests.post(url, json=nuevo_animal, headers=headers)
+print("Respuesta al agregar un nuevo animal:")
+print(response.json())
 
-# GET filtrando por nombre con query params
-ruta_get = url + "estudiantes?nombre=Pedrito"
-get_response = requests.request(method="GET", url=ruta_get)
-print(get_response.text)
+# Listar todos los animales
+response = requests.get(url)
+print("\nLista de todos los animales:")
+print(response.json())
+
+# Buscar animales por especie
+especie = "Panthera leo"
+url_especie = f"{url}?especie={especie}"
+response = requests.get(url_especie)
+print(f"\nAnimales de la especie {especie}:")
+print(response.json())
+
+# Buscar animales por género
+genero = "Masculino"
+url_genero = f"{url}?genero={genero}"
+response = requests.get(url_genero)
+print(f"\nAnimales de género {genero}:")
+print(response.json())
+
+# Actualizar información de un animal
+id_animal = 1
+url_actualizar = f"{url}/{id_animal}"
+datos_actualizados = {
+    "edad": 6,
+    "peso": 190
+}
+response = requests.put(url_actualizar, json=datos_actualizados, headers=headers)
+print("\nRespuesta al actualizar la información de un animal:")
+print(response.json())
+
+# Eliminar un animal
+id_animal_eliminar = 1
+url_eliminar = f"{url}/{id_animal_eliminar}"
+response = requests.delete(url_eliminar)
+print("\nRespuesta al eliminar un animal:")
+print(response.json())
