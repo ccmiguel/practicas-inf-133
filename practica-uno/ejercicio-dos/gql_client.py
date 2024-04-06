@@ -1,73 +1,114 @@
 import requests
+
 # Definir la URL del servidor GraphQL
 url = 'http://localhost:8000/graphql'
 
-# Definir la consulta GraphQL simple
+# Definir la consulta GraphQL para listar todas las plantas
 query_lista = """
 {
-        estudiantes{
-            id
-            nombre
-            apellido
-            carrera
-        }
+    plantas {
+        id
+        nombre_comun
+        especie
+        edad_meses
+        altura_cm
+        tiene_frutos
     }
+}
 """
-# Solicitud POST al servidor GraphQL
 response = requests.post(url, json={'query': query_lista})
+print("Listar todas las plantas:")
 print(response.text)
 
-# Definir la consulta GraphQL con parametros
-query = """
-    {
-        estudiantePorId(id: 2){
-            nombre
-        }
+# Definir la consulta GraphQL para buscar plantas por especie
+query_buscar_por_especie = """
+query BuscarPlantasPorEspecie($especie: String!) {
+    plantasPorEspecie(especie: $especie) {
+        id
+        nombre_comun
+        especie
+        edad_meses
+        altura_cm
+        tiene_frutos
     }
+}
 """
-
-# Solicitud POST al servidor GraphQL
-response = requests.post(url, json={'query': query})
+response = requests.post(url, json={'query': query_buscar_por_especie, 'variables': {'especie': 'Cactaceae'}})
+print("\nBuscar plantas por especie (Cactaceae):")
 print(response.text)
 
-# Definir la consulta GraphQL para crear nuevo estudiante
+# Definir la consulta GraphQL para buscar plantas que tienen frutos
+query_buscar_con_frutos = """
+{
+    plantasConFrutos {
+        id
+        nombre_comun
+        especie
+        edad_meses
+        altura_cm
+        tiene_frutos
+    }
+}
+"""
+response = requests.post(url, json={'query': query_buscar_con_frutos})
+print("\nBuscar plantas que tienen frutos:")
+print(response.text)
+
+# Definir la consulta GraphQL para crear una nueva planta
 query_crear = """
 mutation {
-        crearEstudiante(nombre: "Angel", apellido: "Gomez", carrera: "Biologia") {
-            estudiante {
-                id
-                nombre
-                apellido
-                carrera
-            }
+    crearPlanta(nombreComun: "Orquídea", especie: "Orchidaceae", edadMeses: 12, alturaCm: 25, tieneFrutos: false) {
+        planta {
+            id
+            nombre_comun
+            especie
+            edad_meses
+            altura_cm
+            tiene_frutos
         }
     }
+}
 """
-
-response_mutation = requests.post(url, json={'query': query_crear})
-print(response_mutation.text)
-
-# Lista de todos los estudiantes
-response = requests.post(url, json={'query': query_lista})
+response = requests.post(url, json={'query': query_crear})
+print("\nCrear una nueva planta:")
 print(response.text)
 
-# Definir la consulta GraphQL para eliminar un estudiante
-query_eliminar = """
+# Definir la consulta GraphQL para actualizar la información de una planta
+query_actualizar = """
 mutation {
-        deleteEstudiante(id: 3) {
-            estudiante {
-                id
-                nombre
-                apellido
-                carrera
-            }
+    actualizarPlanta(id: 1, nombreComun: "Cactus", especie: "Cactaceae", edadMeses: 18, alturaCm: 30, tieneFrutos: true) {
+        planta {
+            id
+            nombre_comun
+            especie
+            edad_meses
+            altura_cm
+            tiene_frutos
         }
     }
+}
 """
 
-response_mutation = requests.post(url, json={'query': query_eliminar})
-print(response_mutation.text)
+response = requests.post(url, json={'query': query_actualizar})
+print("\nActualizar la información de una planta:")
+print(response.text)
 
-# Lista de todos los estudiantes
-response = requests.post(url, json={'query': query_lista})
+# Definir la consulta GraphQL para eliminar una planta
+query_eliminar = """
+mutation {
+    eliminarPlanta(id: 2) {
+        planta {
+            id
+            nombre_comun
+            especie
+            edad_meses
+            altura_cm
+            tiene_frutos
+        }
+    }
+}
+"""
+
+response = requests.post(url, json={'query': query_eliminar})
+print("\nEliminar una planta:")
 print(response.text)

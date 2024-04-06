@@ -2,8 +2,20 @@ from http.server import HTTPServer
 from pysimplesoap.server import SoapDispatcher, SOAPHandler
 
 # Define la función del servicio
-def saludar(nombre):
-    return "¡Hola, {}!".format(nombre)
+
+def SumaDosNumeros(x, y):
+    return x + y 
+
+def RestaDosNumeros(x, y):
+    return x - y 
+
+def MultiplicaDosNumeros(x, y):
+    return x * y 
+
+def DivideDosNumeros(x, y):
+    if y == 0:
+        return "Error: No se puede dividir por cero."
+    return x / y 
 
 # Creamos la ruta del servidor SOAP
 dispatcher = SoapDispatcher(
@@ -16,11 +28,33 @@ dispatcher = SoapDispatcher(
 )
 
 # Registramos el servicio
+
 dispatcher.register_function(
-    "Saludar",
-    saludar,
-    returns={"saludo": str},
-    args={"nombre": str},
+    "SumaDosNumeros",
+    SumaDosNumeros,
+    returns={"resultado": int},
+    args={"x": int, "y": int}
+)
+
+dispatcher.register_function(
+    "RestaDosNumeros",
+    RestaDosNumeros,
+    returns={"resultado": int},
+    args={"x": int, "y": int}
+)
+
+dispatcher.register_function(
+    "MultiplicaDosNumeros",
+    MultiplicaDosNumeros,
+    returns={"resultado": int},
+    args={"x": int, "y": int}
+)
+
+dispatcher.register_function(
+    "DivideDosNumeros",
+    DivideDosNumeros,
+    returns={"resultado": int},
+    args={"x": int, "y": int}
 )
 
 # Iniciamos el servidor HTTP
