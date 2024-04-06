@@ -26,10 +26,14 @@ class Query(ObjectType):
         return None
 
     def resolve_plantas_por_especie(root, info, especie):
-        return [planta for planta in plantas if planta.especie == especie]
+        for planta in plantas:
+            if planta.especie == especie:
+                yield planta
 
     def resolve_plantas_con_frutos(root, info):
-        return [planta for planta in plantas if planta.tiene_frutos]
+        for planta in plantas:
+            if planta.tiene_frutos:
+                yield planta
 
 class CrearPlanta(Mutation):
     class Arguments:
