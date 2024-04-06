@@ -1,85 +1,149 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
-estudiantes = [
+
+from urllib.parse import urlparse, parse_qs
+
+pacientes = [
     {
-        "id": 1,
-        "nombre": "Pedrito",
-        "apellido": "García",
-        "carrera": "Ingeniería de Sistemas",
+        "CI": "1234567",
+        "nombre": "María",
+        "apellido": "López",
+        "edad": 30,
+        "género": "Femenino",
+        "diagnóstico": "Hipertensión",
+        "doctor": "Dr. García"
     },
 ]
 
 
-class RESTRequestHandler(BaseHTTPRequestHandler):
-    def response_handler(self, status, data):
-        self.send_response(status)
-        self.send_header("Content-type", "application/json")
-        self.end_headers()
-        self.wfile.write(json.dumps(data).encode("utf-8"))
-    
-    def find_student(self, id):
+class PacientesService:
+    @staticmethod
+    def find_paciente(ci):
         return next(
-            (estudiante for estudiante in estudiantes if estudiante["id"] == id),
+            (paciente for paciente in pacientes if paciente["CI"] == ci),
             None,
         )
-    
+
+    @staticmethod
+    def add_paciente(data):
+        pacientes.append(data)
+        return pacientes
+
+    @staticmethod
+    def update_paciente(ci, data):
+        paciente = PacientesService.find_paciente(ci)
+        if paciente:
+            paciente.update(data)
+            return pacientes
+        else:
+            return None
+
+    @staticmethod
+    def delete_paciente(ci):
+        for i, paciente in enumerate(pacientes):
+            if paciente["CI"] == ci:
+                pacientes.pop(i)
+                return pacientes
+        return None
+
+
+class HTTPResponseHandler:
+    @staticmethod
+    def handle_response(handler, status, data):
+        handler.send_response(status)
+        handler.send_header("Content-type", "application/json")
+        handler.end_headers()
+        handler.wfile.write(json.dumps(data).encode("utf-8"))
+
+
+class RESTRequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        parsed_path = urlparse(self.path)
+        query_params = parse_qs(parsed_path.query)
+
+        if parsed_path.path == "/pacientes":
+            if "diagnóstico" in query_params:
+                diagnostico = query_params["diagnóstico"][0]
+                pacientes_filtrados = [
+                    paciente for paciente in pacientes if paciente["diagnóstico"] == diagnostico
+                ]
+                if pacientes_filtrados:
+                    HTTPResponseHandler.handle_response(
+                        self, 200, pacientes_filtrados
+                    )
+                else:
+                    HTTPResponseHandler.handle_response(self, 204, [])
+            elif "doctor" in query_params:
+                doctor = query_params["doctor"][0]
+                pacientes_doctor = [
+                    paciente for paciente in pacientes if paciente["doctor"] == doctor
+                ]
+                if pacientes_doctor:
+                    HTTPResponseHandler.handle_response(
+                        self, 200, pacientes_doctor
+                    )
+                else:
+                    HTTPResponseHandler.handle_response(self, 204, [])
+            elif "CI" in query_params:
+                ci = query_params["CI"][0]
+                paciente = PacientesService.find_paciente(ci)
+                if paciente:
+                    HTTPResponseHandler.handle_response(self, 200, [paciente])
+                else:
+                    HTTPResponseHandler.handle_response(self, 204, [])
+            else:
+                HTTPResponseHandler.handle_response(self, 200, pacientes)
+        else:
+            HTTPResponseHandler.handle_response(
+                self, 404, {"Error": "Ruta no existente"}
+            )
+
+    def do_POST(self):
+        if self.path == "/pacientes":
+            data = self.read_data()
+            pacientes = PacientesService.add_paciente(data)
+            HTTPResponseHandler.handle_response(self, 201, {"mensaje": "Paciente creado"})
+        else:
+            HTTPResponseHandler.handle_response(
+                self, 404, {"Error": "Ruta no existente"}
+            )
+
+    def do_PUT(self):
+        if self.path.startswith("/pacientes/"):
+            ci = self.path.split("/")[-1]
+            data = self.read_data()
+            pacientes = PacientesService.update_paciente(ci, data)
+            if pacientes:
+                HTTPResponseHandler.handle_response(self, 200, pacientes)
+            else:
+                HTTPResponseHandler.handle_response(
+                    self, 404, {"Error": "Paciente no encontrado"}
+                )
+        else:
+            HTTPResponseHandler.handle_response(
+                self, 404, {"Error": "Ruta no existente"}
+            )
+
+    def do_DELETE(self):
+        if self.path.startswith("/pacientes/"):
+            ci = self.path.split("/")[-1]
+            pacientes = PacientesService.delete_paciente(ci)
+            if pacientes:
+                HTTPResponseHandler.handle_response(self, 200, pacientes)
+            else:
+                HTTPResponseHandler.handle_response(
+                    self, 404, {"Error": "Paciente no encontrado"}
+                )
+        else:
+            HTTPResponseHandler.handle_response(
+                self, 404, {"Error": "Ruta no existente"}
+            )
+
     def read_data(self):
         content_length = int(self.headers["Content-Length"])
         data = self.rfile.read(content_length)
         data = json.loads(data.decode("utf-8"))
         return data
-    
-    def do_GET(self):
-        if self.path == "/estudiantes":
-            self.response_handler(200, estudiantes)
-        elif self.path.startswith("/estudiantes/"):
-            id = int(self.path.split("/")[-1])
-            estudiante = self.find_student(id)
-            if estudiante:
-                self.response_handler(200, [estudiante])
-            else:
-                self.response_handler(204, [])
-
-        else:
-            self.response_handler(404, {"Error": "Ruta no existente"})
-
-    def do_POST(self):
-        if self.path == "/estudiantes":
-            data = self.read_data()
-            data["id"] = len(estudiantes) + 1
-            estudiantes.append(data)
-            self.response_handler(201, estudiantes)
-
-        else:
-            self.response_handler(404, {"Error": "Ruta no existente"})
-
-    def do_PUT(self):
-        if self.path.startswith("/estudiantes/"):
-            id = int(self.path.split("/")[-1])
-            estudiante = self.find_student(id)
-            data = self.read_data()
-            if estudiante:
-                estudiante.update(data)
-                self.response_handler(200, [estudiantes])
-            else:
-                self.response_handler(404, {"Error": "Estudiante no encontrado"})
-        else:
-            self.response_handler(404, {"Error": "Ruta no existente"})
-
-    def do_DELETE(self):
-        if self.path == "/estudiantes":
-            estudiantes.clear()
-            self.response_handler(200, estudiantes)
-        elif self.path.startswith("/estudiantes/"):
-            id = int(self.path.split("/")[-1])
-            estudiante = self.find_student(id)
-            if estudiante:
-                estudiantes.remove(estudiante)
-                self.response_handler(200, estudiantes)
-            else:
-                self.response_handler(404, {"Error": "Estudiante no encontrado"})
-        else:
-            self.response_handler(404, {"Error": "Ruta no existente"})
 
 
 def run_server(port=8000):

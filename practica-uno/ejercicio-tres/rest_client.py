@@ -1,65 +1,65 @@
 import requests
 
-# Consultando a un servidor RESTful
+# URL del servidor RESTful
 url = "http://localhost:8000/"
-# GET obtener a todos los estudiantes por la ruta /estudiantes
-ruta_get = url + "estudiantes"
-get_response = requests.request(method="GET", url=ruta_get)
-print(get_response.text)
-# POST agrega un nuevo estudiante por la ruta /estudiantes
-ruta_post = url + "estudiantes"
-nuevo_estudiante = {
-    "nombre": "Juanito",
-    "apellido": "Pérez",
-    "carrera": "Ingeniería Agronomica",
-}
 
-post_response = requests.request(method="POST", url=ruta_post, json=nuevo_estudiante)
-print(post_response.text)
+# Obtener todos los pacientes
+ruta_get_pacientes = url + "pacientes"
+get_pacientes_response = requests.get(ruta_get_pacientes)
+print("Lista de todos los pacientes:")
+print(get_pacientes_response.text)
 
-# DELETE elimina todos los estudiantes por la ruta /estudiantes
-ruta_eliminar = url + "estudiantes"
-eliminar_response = requests.request(method="DELETE", 
-                                    url=ruta_eliminar)
-print(eliminar_response.text)
-
-# POST agrega un nuevo estudiante por la ruta /estudiantes
-ruta_post = url + "estudiantes"
-nuevo_estudiante = {
-    "nombre": "Juanito",
-    "apellido": "Pérez",
-    "carrera": "Ingeniería Agronomica"
-}
-
-post_response = requests.request(method="POST", 
-                        url=ruta_post,
-                        json=nuevo_estudiante)
-print(post_response.text)
-
-nuevo_estudiante = {
-    "nombre": "Pedrito",
-    "apellido": "Lopez",
-    "carrera": "Ingeniería",
-}
-
-post_response = requests.request(method="POST", url=ruta_post, json=nuevo_estudiante)
-print(post_response.text)
-
-# GET busca a un estudiante por id /estudiantes/{id}
-ruta_filtrar_nombre = url + "estudiantes/1"
-filtrar_nombre_response = requests.request(method="GET", 
-                                url=ruta_filtrar_nombre)
-print(filtrar_nombre_response.text)
-
-# PUT actualiza un estudiante por la ruta /estudiantes
-ruta_actualizar = url + "estudiantes/1"
-estudiante_actualizado = {
+# Agregar un nuevo paciente
+ruta_post_paciente = url + "pacientes"
+nuevo_paciente = {
+    "CI": "1234566",
     "nombre": "Juan",
-    "apellido": "Pérez",
-    "carrera": "Ingeniería Agronomica",
+    "apellido": "Ramirez",
+    "edad": 35,
+    "género": "Masculino",
+    "diagnóstico": "Diabetes",
+    "doctor": "Dr. Ramos",
 }
-put_response = requests.request(
-    method="PUT", url=ruta_actualizar, 
-    json=estudiante_actualizado
-)
-print(put_response.text)
+post_paciente_response = requests.post(ruta_post_paciente, json=nuevo_paciente)
+print("\nRespuesta al agregar un nuevo paciente:")
+print(post_paciente_response.text)
+
+
+# Obtener paciente por CI
+ci_paciente = "1234567"
+ruta_get_paciente_ci = url + f"pacientes?CI={ci_paciente}"
+get_paciente_ci_response = requests.get(ruta_get_paciente_ci)
+print(f"\nPaciente con CI {ci_paciente}:")
+print(get_paciente_ci_response.text)
+
+# Filtrar pacientes por diagnóstico
+diagnostico = "Diabetes"
+ruta_get_pacientes_diagnostico = url + f"pacientes?diagnóstico={diagnostico}"
+get_pacientes_diagnostico_response = requests.get(ruta_get_pacientes_diagnostico)
+print(f"\nPacientes con diagnóstico de {diagnostico}:")
+print(get_pacientes_diagnostico_response.text)
+
+# Filtrar pacientes por doctor
+doctor = "Dr. García"
+ruta_get_pacientes_doctor = url + f"pacientes?doctor={doctor}"
+get_pacientes_doctor_response = requests.get(ruta_get_pacientes_doctor)
+print(f"\nPacientes atendidos por el doctor {doctor}:")
+print(get_pacientes_doctor_response.text)
+
+
+# Actualizar información de un paciente
+ci_paciente_actualizar = "1234567"
+ruta_put_paciente = url + f"pacientes/{ci_paciente_actualizar}"
+datos_actualizados = {
+    "edad": 35,
+    "diagnóstico": "Diabetes",
+}
+put_paciente_response = requests.put(ruta_put_paciente, json=datos_actualizados)
+print("\nRespuesta al actualizar la información de un paciente:")
+print(put_paciente_response.text)
+
+# Eliminar un paciente
+ruta_delete_paciente = url + f"pacientes/{ci_paciente_actualizar}"
+delete_paciente_response = requests.delete(ruta_delete_paciente)
+print("\nRespuesta al eliminar un paciente:")
+print(delete_paciente_response.text)
