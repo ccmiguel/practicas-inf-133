@@ -99,11 +99,19 @@ class Mutations(ObjectType):
     eliminar_planta = EliminarPlanta.Field()
 
 
-plantas=[
-    Planta(id=1, nombre_comun="Cactus", especie="Cactaceae", edad_meses=12, altura_cm=20, tiene_frutos=False),
-    Planta(id=2, nombre_comun="Rosa", especie="Rosa", edad_meses=6, altura_cm=30, tiene_frutos=True),
-    Planta(id=3, nombre_comun="Orquídea", especie="Orchidaceae", edad_meses=9, altura_cm=25, tiene_frutos=False),
-    Planta(id=4, nombre_comun="Margarita", especie="Orchidaceae", edad_meses=4, altura_cm=20, tiene_frutos=True)
+plantas =[
+    Planta(
+        id=1, nombre_comun="Cactus", especie="Cactaceae", edad_meses=12, altura_cm=20, tiene_frutos=False
+    ),
+    Planta(
+        id=2, nombre_comun="Rosa", especie="Rosa", edad_meses=6, altura_cm=30, tiene_frutos=True
+    ),
+    Planta(
+        id=3, nombre_comun="Orquídea", especie="Orchidaceae", edad_meses=9, altura_cm=25, tiene_frutos=False
+    ),
+    Planta(
+        id=4, nombre_comun="Margarita", especie="Orchidaceae", edad_meses=4, altura_cm=20, tiene_frutos=True
+    ),
 ]
 
 schema = Schema(query=Query, mutation=Mutations)
@@ -120,6 +128,7 @@ class GraphQLRequestHandler(BaseHTTPRequestHandler):
             content_length = int(self.headers["Content-Length"])
             data = self.rfile.read(content_length)
             data = json.loads(data.decode("utf-8"))
+            print(data)
             result = schema.execute(data["query"])
             self.response_handler(200, result.data)
         else:

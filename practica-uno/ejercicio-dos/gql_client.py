@@ -4,9 +4,10 @@ import requests
 url = 'http://localhost:8000/graphql'
 
 # Definir la consulta GraphQL para listar todas las plantas
+# Definir la consulta GraphQL para listar todas las plantas
 query_lista = """
 {
-    plantas {
+    plantas{
         id
         nombre_comun
         especie
@@ -93,27 +94,28 @@ mutation {
 }
 """
 
+
 # Realizar solicitudes POST al servidor GraphQL
-response = requests.post(url, json={'query': query_lista})
+response = requests.post(url, json={'query':query_lista})
 print("Listar todas las plantas:")
 print(response.text)
 
-response = requests.post(url, json={'query': query_buscar_por_especie, 'variables': {'especie': 'Cactaceae'}})
+response = requests.post(url, json={'query':query_buscar_por_especie})
 print("\nBuscar plantas por especie (Cactaceae):")
 print(response.text)
 
-response = requests.post(url, json={'query': query_buscar_con_frutos})
+response = requests.post(url, json={'query':query_buscar_con_frutos})
 print("\nBuscar plantas que tienen frutos:")
 print(response.text)
 
-response = requests.post(url, json={'query': query_crear})
+response = requests.post(url, json={'query':query_crear})
 print("\nCrear una nueva planta:")
 print(response.text)
 
-response = requests.post(url, json={'query': query_actualizar})
+response = requests.post(url, json={'query':query_actualizar})
 print("\nActualizar la información de una planta:")
 print(response.text)
 
-response = requests.post(url, json={'query': query_eliminar})
+response = requests.post(url, json={'query':query_eliminar})
 print("\nEliminar una planta:")
 print(response.text)

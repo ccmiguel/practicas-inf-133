@@ -53,7 +53,7 @@ dispatcher.register_function(
 dispatcher.register_function(
     "DivideDosNumeros",
     DivideDosNumeros,
-    returns={"resultado": int},
+    returns={"resultado": float},
     args={"x": int, "y": int}
 )
 

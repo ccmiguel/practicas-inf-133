@@ -1,13 +1,17 @@
 import requests
+import json
 
 url = "http://localhost:8000/"
 
-# GET /player
-response = requests.request(method="GET", url=url + "player")
+# Crear una partida
+data = {"element": "piedra"}
+response = requests.post(url + "games", json=data)
 print(response.text)
 
-# POST /player/damage
-response = requests.request(
-    method="POST", url=url + "player/damage", json={"damage": 10}
-)
+# Listar todas las partidas
+response = requests.get(url + "games")
+print(response.text)
+
+# Listar partidas con resultado "ganó"
+response = requests.get(url + "games?resultado=ganó")
 print(response.text)
